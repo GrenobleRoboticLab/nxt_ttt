@@ -22,6 +22,8 @@ private:
 
 }; // class MyClass
 
+} // namespace nxt_ttt
+
 };
 
 #endif // NT_CLASS
