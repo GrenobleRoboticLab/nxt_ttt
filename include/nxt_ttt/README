@@ -1,0 +1,27 @@
+include files :
+    name : NT_<name>.h
+    namespace in use : nxt_ttt
+
+sample :
+file : NT_Class.h
+
+#ifndef NT_CLASS
+#define NT_CLASS
+
+namespace nxt_ttt {
+
+class MyCLass {
+public:
+    MyClass();
+    virtual ~MyClass();
+
+    void   getVar();
+
+private:
+    int    m_nVar;
+
+}; // class MyClass
+
+};
+
+#endif // NT_CLASS
