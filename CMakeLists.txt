@@ -26,5 +26,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
-rosbuild_add_executable(nxt_ttt src/main.cpp)
+rosbuild_add_executable(nxt_ttt src/main.cpp
+                                src/NT_Application.cpp
+                                src/NT_AbstractTTT.cpp
+                                src/NT_AbstractRobot.cpp)
+
 #target_link_libraries(example ${PROJECT_NAME})
