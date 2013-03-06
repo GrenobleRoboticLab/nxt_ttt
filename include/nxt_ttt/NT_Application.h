@@ -12,14 +12,15 @@ enum NT_USER {
 
 
 class Application {
+
 public:
     Application();
     ~Application();
 
+    void            setTTT(AbstractTTT* pTTT);
+
     void            start();
     void            stop();
-
-    void            setTTT(AbstractTTT* pTTT);
 
     void            cbPlayed(NT_USER user);
     void            cbEnd(NT_USER winner);
@@ -28,7 +29,6 @@ private:
     NT_USER         m_CurrentPlayer;
     AbstractTTT*    m_pTTT;
     ros::NodeHandle m_NodeHandle;
-
 
 }; //class Application
 

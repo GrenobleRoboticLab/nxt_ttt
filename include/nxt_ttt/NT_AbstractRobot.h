@@ -14,6 +14,7 @@ public:
 
     void            setApplication(Application* pApp);
     void            setTTT(AbstractTTT* pTTT);
+
     virtual void    getColor(int x, int y) = 0;
     virtual void    dropBall(int x, int y) = 0;
 
