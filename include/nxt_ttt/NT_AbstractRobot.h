@@ -1,8 +1,9 @@
 #ifndef NT_ABSTRACTROBOT_H
 #define NT_ABSTRACTROBOT_H
 
-#include "NT_Application.h"
-#include "NT_AbstractTTT.h"
+#include "nxt_ttt/NT_Application.h"
+#include "nxt_ttt/NT_AbstractTTT.h"
+#include "nxt_ttt/NT_Helper.h"
 
 namespace nxt_ttt  {
 

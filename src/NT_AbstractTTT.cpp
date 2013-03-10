@@ -3,7 +3,9 @@
 using namespace nxt_ttt;
 
 AbstractTTT::AbstractTTT() {
-    m_pApplication = NULL;
+    m_pApplication  = NULL;
+    boardEmpty = true;
+    firstTime = true;
 }
 
 AbstractTTT::~AbstractTTT() {
@@ -11,11 +13,4 @@ AbstractTTT::~AbstractTTT() {
 
 void AbstractTTT::setApplication(Application *pApp) {
     m_pApplication = pApp;
-}
-
-void AbstractTTT::cbColor(int x, int y, int color) {
-    m_nBoard[x][y] = color;
-}
-
-void AbstractTTT::cbDropped(int x, int y) {
 }

@@ -25,7 +25,7 @@ public:
 private:
     Application*    m_pApplication;
 
-    Color*           board[3][3];
+    Color*          board[3][3];
     bool            boardEmpty;
     bool            firstTime;
 
