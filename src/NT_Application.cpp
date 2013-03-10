@@ -34,8 +34,10 @@ void Application::cbPlayed(NT_USER user)
             stop();
         }
     }
-    else
+    else // if(user == NT_TTT
     {
+        if (m_pRobot)
+            m_pRobot->waitPlayerPlay();
         std::cout << "Your turn !" << std::endl;
     }
 }

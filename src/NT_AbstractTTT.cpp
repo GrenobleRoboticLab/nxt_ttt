@@ -4,8 +4,7 @@ using namespace nxt_ttt;
 
 AbstractTTT::AbstractTTT() {
     m_pApplication  = NULL;
-    boardEmpty = true;
-    firstTime = true;
+    m_pRobot        = NULL;
 }
 
 AbstractTTT::~AbstractTTT() {
@@ -13,4 +12,9 @@ AbstractTTT::~AbstractTTT() {
 
 void AbstractTTT::setApplication(Application *pApp) {
     m_pApplication = pApp;
+}
+
+void AbstractTTT::setRobot(AbstractRobot *pRobot)
+{
+    m_pRobot = pRobot;
 }

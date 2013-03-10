@@ -13,24 +13,19 @@ class AbstractTTT {
 
 public:
     AbstractTTT();
-    ~AbstractTTT();
+    virtual ~AbstractTTT();
 
     void            setApplication(Application* pApp);
+    void            setRobot(AbstractRobot* pRobot);
 
     virtual void    play() = 0;
 
-    void            cbColor(int x, int y, Color* color);
-    void            cbDropped(int x, int y);
+    virtual void    cbColor(int x, int y, Color color) = 0;
+    virtual void    cbDropped(int x, int y) = 0;
 
-private:
+protected:
     Application*    m_pApplication;
-
-    Color*          board[3][3];
-    bool            boardEmpty;
-    bool            firstTime;
-
-    bool            forceDrop();
-    void            bestDrop();
+    AbstractRobot*  m_pRobot;
 
 }; //class AbstractTTT
 

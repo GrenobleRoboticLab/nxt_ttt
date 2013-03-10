@@ -29,6 +29,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 rosbuild_add_executable(nxt_ttt src/main.cpp
                                 src/NT_Application.cpp
                                 src/NT_AbstractTTT.cpp
-                                src/NT_AbstractRobot.cpp)
+                                src/NT_AbstractRobot.cpp
+                                src/NT_TTT.cpp
+                                src/NT_Helper.cpp)
 
 #target_link_libraries(example ${PROJECT_NAME})

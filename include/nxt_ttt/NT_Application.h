@@ -3,13 +3,14 @@
 
 #include <ros/ros.h>
 #include "NT_AbstractTTT.h"
+#include "NT_AbstractRobot.h"
 
 namespace nxt_ttt {
+
 enum NT_USER {
     NT_PLAYER,
     NT_TTT
 };
-
 
 class Application {
 
@@ -28,6 +29,7 @@ public:
 private:
     NT_USER         m_CurrentPlayer;
     AbstractTTT*    m_pTTT;
+    AbstractRobot*  m_pRobot;
     ros::NodeHandle m_NodeHandle;
 
 }; //class Application

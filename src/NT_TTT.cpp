@@ -2,14 +2,23 @@
 
 using namespace nxt_ttt;
 
+TTT::TTT() : AbstractTTT()
+{
+    m_bBoardEmpty = true;
+    m_bFirstTime = true;
+}
+
+TTT::~TTT() { ; }
+
 void TTT::play()
 {
-
+    scan();
+/*
     for (int i=0; i<3; i++)
     {
         for(int j=0; j<3; j++)
         {
-            AbstractRobot::getColor(i, j);play;
+            m_pRobot->getColor(i, j);
             if(board[i][j]!=0)
             {
                 boardEmpty == false;
@@ -25,7 +34,7 @@ void TTT::play()
     {
         if(firstTime)
         {
-            if(board[1][1]==0)
+            if(board[1][1].isNotColor())
             {
                 AbstractRobot::dropBall(1,1);
                 firstTime == false;
@@ -44,140 +53,271 @@ void TTT::play()
             }
         }
     }
+    */
 }
 
-void TTT::cbColor(int x, int y, Color *color)
+void TTT::cbColor(int x, int y, Color color)
 {
-    board[x][y] == color;
+    if (m_wCurrentState == TS_SCAN)
+    {
+        if (color.isColor())
+            m_bBoardEmpty = false;
+
+        m_Board[x][y] = color;
+        continueScan();
+    }
 }
 
-bool TTT::forceDrop()
+void TTT::cbDropped(int x, int y)
 {
-    if(board[0][0]==board[1][0] && board[2][0]==0)
+    if (m_wCurrentState == TS_DROP)
     {
-        AbstractRobot::dropBall(2,0);
-        return true;
+        m_wCurrentState = TS_NONE;
+        m_pApplication->cbPlayed(NT_TTT);
     }
-    else if(board[1][0]==board[2][0] && board[0][0]==0)
+}
+
+TTT::CheckResult TTT::checkRow(int j)
+{
+    CheckResult ret;
+    int playerColorCount    = 0,
+        tttColorCount       = 0;
+
+    for (int i = 0; i < 3; i++)
     {
-        AbstractRobot::dropBall(0,0);
-        return true;
+        if (m_Board[i][j] == NOCOLOR)
+        {
+            ret.lastX = i;
+            ret.lastY = j;
+        }
+        else if (m_Board[i][j] == PLAYERCOLOR)
+            playerColorCount++;
+        else
+            tttColorCount++;
     }
-    else if(board[0][1]==board[1][0] && board[2][1]==0)
+
+    if ((tttColorCount + playerColorCount) == 3)
+        ret.flag = CF_FREE;
+    else if (tttColorCount == 2)
+        ret.flag = CF_CHOICE;
+    else if (playerColorCount == 2)
+        ret.flag = CF_WARNING;
+    else if (tttColorCount == 3)
+        ret.flag = CF_WIN;
+    else if (playerColorCount == 3)
+        ret.flag = CF_LOSE;
+
+    return ret;
+}
+
+TTT::CheckResult TTT::checkCol(int i)
+{
+    CheckResult ret;
+    int playerColorCount    = 0,
+        tttColorCount       = 0;
+
+    for (int j = 0; j < 3; j++)
     {
-        AbstractRobot::dropBall(2,1);
-        return true;
+        if (m_Board[i][j] == NOCOLOR)
+        {
+            ret.lastX = i;
+            ret.lastY = j;
+        }
+        else if (m_Board[i][j] == PLAYERCOLOR)
+            playerColorCount++;
+        else
+            tttColorCount++;
     }
-    else if(board[1][1]==board[2][1] && board[0][1]==0)
+
+    if ((tttColorCount + playerColorCount) == 3)
+        ret.flag = CF_FREE;
+    else if (tttColorCount == 2)
+        ret.flag = CF_CHOICE;
+    else if (playerColorCount == 2)
+        ret.flag = CF_WARNING;
+    else if (tttColorCount == 3)
+        ret.flag = CF_WIN;
+    else if (playerColorCount == 3)
+        ret.flag = CF_LOSE;
+
+    return ret;
+}
+
+TTT::CheckResult TTT::checkDiag(int i)
+{
+    CheckResult ret;
+    int playerColorCount    = 0,
+        tttColorCount       = 0;
+
+    if(m_Board[1][1] == NOCOLOR)
     {
-        AbstractRobot::dropBall(0,1);
-        return true;
+        ret.lastX = 1;
+        ret.lastY = 1;
     }
-    else if(board[0][2]==board[1][2] && board[2][2]==0)
+    else if(m_Board[1][1] == PLAYERCOLOR)
+        playerColorCount++;
+    else
+        tttColorCount++;
+
+    if(i == 0)
     {
-        AbstractRobot::dropBall(2,2);
-        return true;
+        if(m_Board[0][0] == NOCOLOR)
+        {
+            ret.lastX = 0;
+            ret.lastY = 0;
+        }
+        else if(m_Board[0][0] == PLAYERCOLOR)
+            playerColorCount++;
+        else
+            tttColorCount++;
+
+        if(m_Board[2][2] == NOCOLOR)
+        {
+            ret.lastX = 2;
+            ret.lastY = 2;
+        }
+        else if(m_Board[2][2] == PLAYERCOLOR)
+            playerColorCount++;
+        else
+            tttColorCount++;
     }
-    else if(board[1][2]==board[2][2] && board[0][2]==0)
+    else if(i == 2)
     {
-        AbstractRobot::dropBall(0,2);
-        return true;
+        if(m_Board[2][0] == NOCOLOR)
+        {
+            ret.lastX = 2;
+            ret.lastY = 0;
+        }
+        else if(m_Board[2][0] == PLAYERCOLOR)
+            playerColorCount++;
+        else
+            tttColorCount++;
+
+        if(m_Board[0][2] == NOCOLOR)
+        {
+            ret.lastX = 0;
+            ret.lastY = 2;
+        }
+        else if(m_Board[0][2] == PLAYERCOLOR)
+            playerColorCount++;
+        else
+            tttColorCount++;
     }
-    else if(board[0][0]==board[0][1] && board[0][2]==0)
+
+    if ((tttColorCount + playerColorCount) == 3)
+        ret.flag = CF_FREE;
+    else if (tttColorCount == 2)
+        ret.flag = CF_CHOICE;
+    else if (playerColorCount == 2)
+        ret.flag = CF_WARNING;
+    else if (tttColorCount == 3)
+        ret.flag = CF_WIN;
+    else if (playerColorCount == 3)
+        ret.flag = CF_LOSE;
+
+    return ret;
+}
+
+void TTT::scan()
+{
+    m_wCurrentState = TS_SCAN;
+    m_nCurrentX     = 0;
+    m_nCurrentY     = 0;
+    m_pRobot->getColor(m_nCurrentX, m_nCurrentY);
+}
+
+void TTT::continueScan()
+{
+    if (m_wCurrentState == TS_SCAN)
     {
-        AbstractRobot::dropBall(0,2);
-        return true;
+        m_nCurrentY++;
+        if (m_nCurrentY < 3)
+            m_pRobot->getColor(m_nCurrentX, m_nCurrentY);
+        else {
+            m_nCurrentX ++;
+            m_nCurrentY = 0;
+            if (m_nCurrentX < 3)
+                m_pRobot->getColor(m_nCurrentX, m_nCurrentY);
+            else
+                treat();
+        }
     }
-    else if(board[0][2]==board[0][1] && board[0][0]==0)
+}
+
+void TTT::treat()
+{
+    m_wCurrentState = TS_DROP;
+
+    if(m_bBoardEmpty)
     {
-        AbstractRobot::dropBall();
-        return true;
-    }
-    else if(board[1][0]==board[1][1] && board[1][2]==0)
-    {
-        AbstractRobot::dropBall(1,2);
-        return true;
-    }
-    else if(board[1][2]==board[1][1] && board[1][0]==0)
-    {
-        AbstractRobot::dropBall(1,0);
-        return true;
-    }
-    else if(board[2][2]==board[2][1] && board[2][0]==0)
-    {
-        AbstractRobot::dropBall(2,0);
-        return true;
-    }
-    else if(board[2][0]==board[2][1] && board[2][2]==0)
-    {
-        AbstractRobot::dropBall(2,2);
-        return true;
-    }
-    else if(board[0][0]==board[1][1] && board[2][2]==0)
-    {
-        AbstractRobot::dropBall(2,2);
-        return true;
-    }
-    else if(board[2][2]==board[1][1] && board[0][0]==0)
-    {
-        AbstractRobot::dropBall(0,0);
-        return true;
-    }
-    else if(board[0][2]==board[1][1] && board[2][0]==0)
-    {
-        AbstractRobot::dropBall(2,0);
-        return true;
-    }
-    else if(board[2][0]==board[1][1] && board[0][2]==0)
-    {
-        AbstractRobot::dropBall(0,2);
-        return true;
-    }
-    else if(board[2][2]==board[2][0] && board[2][1]==0)
-    {
-        AbstractRobot::dropBall(2,1);
-        return true;
-    }
-    else if(board[0][2]==board[2][2] && board[1][2]==0)
-    {
-        AbstractRobot::dropBall(1,2);
-        return true;
-    }
-    else if(board[0][0]==board[0][2] && board[0][1]==0)
-    {
-        AbstractRobot::dropBall(0,1);
-        return true;
-    }
-    else if(board[0][0]==board[2][0] && board[1][0]==0)
-    {
-        AbstractRobot::dropBall(1,0);
-        return true;
+        m_pRobot->dropBall(1,1);
+        return;
     }
     else
     {
-        return false;
+        CheckResult result;
+
+        for(int i=0; i<3; i++)
+        {
+            result = checkCol(i);
+            if (applyResult(result))
+                return;
+
+            result = checkRow(i);
+            if (applyResult(result))
+                return;
+        }
+
+        result = checkDiag(0);
+        if (applyResult(result))
+            return;
+
+        result = checkDiag(2);
+        if (applyResult(result))
+            return;
+    }
+    bestDrop();
+}
+
+bool TTT::applyResult(CheckResult check)
+{
+    bool bRet = false;
+
+    if(check.flag != CF_FREE)
+    {
+        bRet = true;
+        if (check.flag == CF_WIN)
+            m_pApplication->cbEnd(NT_TTT);
+        else if (check.flag == CF_LOSE)
+            m_pApplication->cbEnd(NT_PLAYER);
+        else
+        {
+            m_wCurrentState = TS_NONE;
+            m_pRobot->dropBall(check.lastX, check.lastY);
+        }
     }
 
+    return bRet;
 }
 
 void TTT::bestDrop()
 {
     for(int i=0; i<3; i++)
     {
-        for(j=0; j<3; j++)
+        for(int j=0; j<3; j++)
         {
-            if(board[i][j]==2)
+            if(m_Board[i][j] == PLAYERCOLOR)
             {
                 int bestX, bestY, oppX, oppY;
 
                 if(i==0 && j==0) { oppX = 2; oppY = 2; }
-                if(i==1 && j==0) { oppX = 1; oppY = 2; }
-                if(i==2 && j==0) { oppX = 0; oppY = 2; }
-                if(i==0 && j==1) { oppX = 2; oppY = 1; }
-                if(i==2 && j==1) { oppX = 0; oppY = 1; }
-                if(i==0 && j==2) { oppX = 2; oppY = 0; }
-                if(i==1 && j==2) { oppX = 1; oppY = 0; }
-                if(i==2 && j==2) { oppX = 0; oppY = 0; }
+                else if(i==1 && j==0) { oppX = 1; oppY = 2; }
+                else if(i==2 && j==0) { oppX = 0; oppY = 2; }
+                else if(i==0 && j==1) { oppX = 2; oppY = 1; }
+                else if(i==2 && j==1) { oppX = 0; oppY = 1; }
+                else if(i==0 && j==2) { oppX = 2; oppY = 0; }
+                else if(i==1 && j==2) { oppX = 1; oppY = 0; }
+                else if(i==2 && j==2) { oppX = 0; oppY = 0; }
 
                 do
                 {
@@ -186,7 +326,8 @@ void TTT::bestDrop()
                 }
                 while( ( bestX==1 && bestY==1) || (bestX==i && bestY==j) || (bestX==oppX && bestY==oppY) );
 
-                AbstractRobot::dropBall(bestX, bestY);
+                m_pRobot->dropBall(bestX, bestY);
+                return;
             }
         }
     }

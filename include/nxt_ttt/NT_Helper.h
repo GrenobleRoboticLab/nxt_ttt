@@ -4,18 +4,27 @@
 namespace nxt_ttt {
 
 class Color {
-
 public:
-    Color();
+    Color(float fRed = 0.0f, float fGreen = 0.0f, float fBlue = 0.0f);
+    Color(const Color & color) { initFrom(color); }
     ~Color();
 
-    float   getRed() { return m_fRed; }
-    float   getGreen() { return m_fGreen; }
-    float   getBlue() { return m_fBlue; }
+    bool    operator==(const Color & color) { return compare(color); }
+    const Color& operator=(const Color & color) { initFrom(color); return *this;}
 
-    void    setRed(float fValue) { m_fRed = fValue; }
-    void    setGreen(float fValue) { m_fGreen = fValue; }
-    void    setBlue(float fValue) { m_fBlue = fValue; }
+    bool    compare(const Color & color);
+    void    initFrom(const Color & color);
+
+    float   getRed()                { return m_fRed;        }
+    float   getGreen()              { return m_fGreen;      }
+    float   getBlue()               { return m_fBlue;       }
+
+    void    setRed(float fValue)    { m_fRed = fValue;      }
+    void    setGreen(float fValue)  { m_fGreen = fValue;    }
+    void    setBlue(float fValue)   { m_fBlue = fValue;     }
+
+    bool    isColor();
+    bool    isNotColor();
 
 private:
     float   m_fRed;
@@ -23,6 +32,10 @@ private:
     float   m_fBlue;
 
 };
+
+const Color BOTCOLOR(0.0f, 0.0f, 1.0f);
+const Color PLAYERCOLOR(0.0f, 1.0f, 0.0f);
+const Color NOCOLOR(0.0f, 0.0f, 0.0f);
 
 }
 
