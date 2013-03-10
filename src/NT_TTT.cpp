@@ -5,7 +5,6 @@ using namespace nxt_ttt;
 void TTT::play()
 {
 
-    // scan
     for (int i=0; i<3; i++)
     {
         for(int j=0; j<3; j++)
@@ -43,14 +42,8 @@ void TTT::play()
             {
                 bestDrop();
             }
-
         }
-
     }
-
-
-    // drop
-
 }
 
 void TTT::cbColor(int x, int y, Color *color)
