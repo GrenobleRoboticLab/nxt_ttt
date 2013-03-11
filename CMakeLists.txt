@@ -31,6 +31,7 @@ rosbuild_add_executable(nxt_ttt src/main.cpp
                                 src/NT_AbstractTTT.cpp
                                 src/NT_AbstractRobot.cpp
                                 src/NT_TTT.cpp
-                                src/NT_Helper.cpp)
+                                src/NT_Helper.cpp
+                                src/NT_Robot.cpp)
 
 #target_link_libraries(example ${PROJECT_NAME})

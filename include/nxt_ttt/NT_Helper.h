@@ -1,6 +1,12 @@
 #ifndef NT_HELPER_H
 #define NT_HELPER_H
 
+#include <iostream>
+
+void LOG(const std::string & sLog);
+void STARTLOG(const char * pFilename);
+void STOPLOG();
+
 namespace nxt_ttt {
 
 class Color {

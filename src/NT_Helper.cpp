@@ -1,6 +1,28 @@
+#include <stdio.h>
 #include "nxt_ttt/NT_Helper.h"
 
 using namespace nxt_ttt;
+
+FILE* pFile;
+
+void LOG(const std::string & sLog)
+{
+    if (pFile)
+        fputs(sLog.c_str(), pFile);
+}
+
+void STARTLOG(const char * pFilename)
+{
+    pFile = fopen(pFilename, "w");
+    LOG("Start logging\n");
+}
+
+void STOPLOG()
+{
+    LOG("Stop logging\n");
+    if (pFile)
+        fclose(pFile);
+}
 
 Color::Color(float fRed, float fGreen, float fBlue)
 {
