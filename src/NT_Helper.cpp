@@ -8,6 +8,7 @@ time_t  startTime = time(NULL);
 
 void LOG(const std::string & sLog)
 {
+    std::cout << sLog;
     if (pFile)
     {
         fprintf(pFile, "%f : ", difftime(time(NULL), startTime));

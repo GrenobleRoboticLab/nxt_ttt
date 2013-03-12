@@ -1,6 +1,8 @@
 #ifndef NT_ROBOT_H
 #define NT_ROBOT_H
 
+#include <vector>
+
 #include "nxt_ttt/NT_AbstractRobot.h"
 #include "nxt_ttt/NT_TTT.h"
 #include "nxt_ttt/NT_Helper.h"
@@ -25,15 +27,21 @@ public:
     ~BotBoard();
 
     void                    updatePlatPos(double dPlatMotorPos);
+    void                    updateSlidePos(double dSlideMotorPos);
 
     double                  getPlatRotation(int x, int y);
-    double                  getSlideRotation(int x, int y);
+    double                  getColorSlideRotation(int x, int y);
+    double                  getDropSlideRotation(int x, int y);
 
 private:
     double                  m_dPlatAngle;
+    double                  m_dSlideAngle;
 
     double                  m_dFirstPlatMotorPos;
     double                  m_dLastPlatMotorPos;
+
+    double                  m_dFirstSlideMotorPos;
+    double                  m_dLastSlideMotorPos;
 };
 
 class MotorState {
@@ -78,27 +86,27 @@ public:
 
     bool                    update(const MotorState & state);
     bool                    rotate(double dRadAngle);
+    bool                    rollback();
     void                    stop();
 
     void                    setName(const std::string & sName) { m_sName = sName;   }
     std::string             getName()                    const { return m_sName;    }
+    double                  getPos()                     const { return m_fPos;     }
 
 private:
     ros::Publisher          m_Publisher;
     nxt_msgs::JointCommand  m_Command;
 
-    std::string             m_sName;
-
-    float                   m_fPosDesi;
-    float                   m_fPos;
-
-    float                   m_fEffDesi;
-    float                   m_fEff;
-
-    float                   m_fVelocity;
-
     Robot*                  m_pParent;
     bool                    m_bHasGoal;
+    double                  m_dLastRotation;
+
+    std::string             m_sName;
+    float                   m_fPosDesi;
+    float                   m_fPos;
+    float                   m_fEffDesi;
+    float                   m_fEff;
+    float                   m_fVelocity;
 
     void                    checkGoal();
     void                    publish();
@@ -119,6 +127,7 @@ private:
         RS_TURNINGPLATMOTOR     = 1,
         RS_TURNINGDROPMOTOR     = 2,
         RS_TURNINGSLIDEMOTOR    = 4,
+        RS_TURNINGMASK          = 7,
         RS_WAITINGCOLOR         = 8,
         RS_WAITINGPLAYEREVENT   = 16
     };
@@ -148,12 +157,19 @@ private:
     Motor                   m_DropMotor;
     Motor                   m_SlideMotor;
 
+    BotBoard                m_BotBoard;
+
     int                     m_nDesiX;
     int                     m_nDesiY;
 
     double                  m_dPlatOr;
 
+    std::vector<Color>      m_vColor;
+
     void                    stopAll();
+    void                    rotatePlatMotor(double dRad);
+    void                    rotateSlideMotor(double dRad);
+    void                    rotateDropMotor(double dRad);
 
     void                    motorCb(const sensor_msgs::JointState::ConstPtr & msg);
     void                    ultraCb(const nxt_msgs::Range::ConstPtr & msg);

@@ -5,6 +5,8 @@ using namespace nxt_ttt;
 const int           translateX = 1;
 const int           translateY = 1;
 
+const double        dropRotation = 0.0;
+
 const std::string   PLATNAME("plat_motor");
 const std::string   SLIDENAME("slide_motor");
 const std::string   DROPNAME("drop_motor");
@@ -23,6 +25,14 @@ void BotBoard::updatePlatPos(double dPlatMotorPos)
     m_dPlatAngle = m_dLastPlatMotorPos - m_dFirstPlatMotorPos;
 }
 
+void BotBoard::updateSlidePos(double dSlideMotorPos)
+{
+    if (m_dFirstSlideMotorPos == 0.0)
+        m_dFirstSlideMotorPos = dSlideMotorPos;
+    m_dLastSlideMotorPos = dSlideMotorPos;
+    m_dSlideAngle = m_dLastSlideMotorPos - m_dFirstSlideMotorPos;
+}
+
 double BotBoard::getPlatRotation(int x, int y)
 {
     int     nX      = x - translateX,
@@ -33,12 +43,20 @@ double BotBoard::getPlatRotation(int x, int y)
     return dAngle - m_dPlatAngle;
 }
 
-double BotBoard::getSlideRotation(int x, int y)
+double BotBoard::getColorSlideRotation(int x, int y)
 {
     int     nX      = x - translateX,
             nY      = y - translateY;
 
-    return /* double dRad = */sqrt(pow(nX, 2) + pow(nY, 2));
+    return /* double dRad = */sqrt(pow(nX, 2) + pow(nY, 2)) - m_dSlideAngle;
+}
+
+double BotBoard::getDropSlideRotation(int x, int y)
+{
+    int     nX      = x - translateX,
+            nY      = y - translateY;
+
+    return /* double dRad = */sqrt(pow(nX, 2) + pow(nY, 2)) - m_dSlideAngle;
 }
 
 MotorState::MotorState(const std::string &sName, double dEffort, double dPosition, double dVelocity)
@@ -122,9 +140,10 @@ bool Motor::rotate(double dRadAngle)
     if (!m_bHasGoal)
     {
         LOG("INFO : Motor : " + m_sName + " Setting goal.\n");
-        m_bHasGoal  = true;
-        m_fPosDesi  = m_fPos + dRadAngle;
-        bRet = true;
+        m_bHasGoal      = true;
+        m_fPosDesi      = m_fPos + dRadAngle;
+        m_dLastRotation = dRadAngle;
+        bRet            = true;
     }
     else
         LOG("ERROR : Motor : " + m_sName + " Try to set goal but has already a goal.\n");
@@ -132,9 +151,14 @@ bool Motor::rotate(double dRadAngle)
     return bRet;
 }
 
+bool Motor::rollback()
+{
+    return rotate(-m_dLastRotation);
+}
+
 void Motor::stop()
 {
-    LOG("INFO : Motor : " + m_sName + "Ask for stopping.");
+    LOG("INFO : Motor : " + m_sName + "Ask for stopping.\n");
     m_fEffDesi = 0.0f;
     publish();
 }
@@ -145,7 +169,6 @@ void Motor::checkGoal()
 
     if (m_bHasGoal)
     {
-        std::cout << "Effort : " << m_fEff << " Effort desi = " << m_fEffDesi << std::endl;
         if (m_fVelocity == 0.0 && (m_fEff == m_fEffDesi))
         {
             if (m_fEffDesi == 0.0)
@@ -161,8 +184,7 @@ void Motor::checkGoal()
         }
         else // if (abs(m_fVelocity) > 0)
         {
-            std::cout << "Position desi = " << m_fPosDesi << " \t Position = " << m_fPos << std::endl;
-            if ((m_fEffDesi > 0)
+            if ((m_fEffDesi >= 0)
              && (m_fPos < (m_fPosDesi + .2f))
              && (m_fPos > (m_fPosDesi - .2)))
             {
@@ -220,50 +242,120 @@ Robot::~Robot()
 
 void Robot::getColor(int x, int y)
 {
-    if (m_CurrentAction != RA_NONE)
-        LOG("ERROR : Robot : The robot didn't finidh his previous action.");
-    stopAll();
-    m_CurrentAction = RA_GETCOLOR;
+    if(m_CurrentAction == RA_NONE)
+    {
+        LOG("INFO : Robot : Started action : getting color\n");
+        stopAll();
+        m_CurrentAction = RA_GETCOLOR;
+        m_BotBoard.updatePlatPos(m_PlatMotor.getPos());
+        m_BotBoard.updateSlidePos(m_SlideMotor.getPos());
 
-    // rotate platMotor & slideMotor
+        rotatePlatMotor(m_BotBoard.getPlatRotation(x, y));
+        rotateSlideMotor(m_BotBoard.getColorSlideRotation(x, y));
+    }
+    else //if (m_CurrentAction != RA_NONE)
+        LOG("ERROR : Robot : The robot didn't finish his previous action.\n");
 }
 
 void Robot::dropBall(int x, int y)
 {
-    if (m_CurrentAction != RA_NONE)
-        LOG("ERROR : Robot : The robot didn't finidh his previous action.");
-    stopAll();
-    m_CurrentAction = RA_DROPBALL;
+    if (m_CurrentAction == RA_NONE)
+    {
+        LOG("INFO : Robot : Started action : dropping ball\n");
+        stopAll();
+        m_CurrentAction = RA_DROPBALL;
+        m_BotBoard.updatePlatPos(m_PlatMotor.getPos());
+        m_BotBoard.updateSlidePos(m_SlideMotor.getPos());
 
-    // rotate platMotor & slideMotor
+
+        rotatePlatMotor(m_BotBoard.getPlatRotation(x, y));
+        rotateSlideMotor(m_BotBoard.getDropSlideRotation(x, y));
+    }
+    else // if (m_CurrentAction != RA_NONE)
+        LOG("ERROR : Robot : The robot didn't finidh his previous action.\n");
 }
 
 void Robot::waitPlayerPlay()
 {
     if (m_CurrentAction != RA_NONE)
-        LOG("ERROR : Robot : The robot didn't finidh his previous action.");
+        LOG("ERROR : Robot : The robot didn't finish his previous action.\n");
     stopAll();
     m_CurrentAction = RA_GETPLAYEREVENT;
 }
 
 void Robot::actionPerformed(const std::string &sMotorName)
 {
+    bool bDropped = false;
+
+    if (((m_State & RS_TURNINGPLATMOTOR) == RS_TURNINGPLATMOTOR) && sMotorName == PLATNAME)
+    {
+        m_BotBoard.updatePlatPos(m_PlatMotor.getPos());
+        m_State &= ~RS_TURNINGPLATMOTOR;
+    }
+    else if (((m_State & RS_TURNINGDROPMOTOR) == RS_TURNINGDROPMOTOR) && sMotorName == DROPNAME)
+    {
+        m_BotBoard.updatePlatPos(m_PlatMotor.getPos());
+        m_State     &= ~RS_TURNINGDROPMOTOR;
+        bDropped    = true;
+    }
+    else if (((m_State & RS_TURNINGSLIDEMOTOR) == RS_TURNINGSLIDEMOTOR) && sMotorName == SLIDENAME)
+    {
+        m_BotBoard.updatePlatPos(m_PlatMotor.getPos());
+        m_State &= ~RS_TURNINGSLIDEMOTOR;
+    }
+
     if(m_CurrentAction == RA_GETCOLOR)
     {
-        // todo
+        if ((m_State & RS_TURNINGMASK) == RS_NONE)
+        {
+            LOG("INFO : Robot : wait color\n");
+            m_State = m_State | RS_WAITINGCOLOR;
+        }
     }
     else if (m_CurrentAction == RA_DROPBALL)
     {
-        // todo
+        if ((m_State & RS_TURNINGMASK) == RS_NONE)
+        {
+            if (bDropped)
+            {
+                LOG("INFO : Robot : TTT Played\n");
+                m_DropMotor.rollback();
+
+                if (m_pApplication)
+                    m_pApplication->cbPlayed(NT_PLAYER);
+
+                m_CurrentAction = RA_NONE;
+            }
+            else // if(!bDropped)
+                rotateDropMotor(dropRotation);
+        }
     }
 }
 
 void Robot::stopAll()
 {
-    LOG("INFO : Robot : Stopping all motor.");
+    LOG("INFO : Robot : Stopping all motor.\n");
     m_SlideMotor.stop();
     m_PlatMotor.stop();
     m_DropMotor.stop();
+}
+
+void Robot::rotateDropMotor(double dRad)
+{
+    m_State = m_State | RS_TURNINGDROPMOTOR;
+    m_DropMotor.rotate(dRad);
+}
+
+void Robot::rotatePlatMotor(double dRad)
+{
+    m_State = m_State | RS_TURNINGPLATMOTOR;
+    m_PlatMotor.rotate(dRad);
+}
+
+void Robot::rotateSlideMotor(double dRad)
+{
+    m_State = m_State | RS_TURNINGSLIDEMOTOR;
+    m_SlideMotor.rotate(dRad);
 }
 
 void Robot::motorCb(const sensor_msgs::JointState::ConstPtr &msg)
@@ -290,6 +382,7 @@ void Robot::ultraCb(const nxt_msgs::Range::ConstPtr &msg)
     {
         if (msg->range < 0.2)
         {
+            LOG("INFO : Robot : Player Played\n");
             if (m_pApplication)
                 m_pApplication->cbPlayed(NT_PLAYER);
             m_CurrentAction = RA_NONE;
@@ -301,8 +394,21 @@ void Robot::colorCb(const nxt_msgs::Color::ConstPtr &msg)
 {
     if ((m_State & RS_WAITINGCOLOR) == RS_WAITINGCOLOR)
     {
-        m_pTTT->cbColor(m_nDesiX, m_nDesiY, Color(msg->r, msg->g, msg->b));
-        m_State = RS_NONE;
+        m_vColor.push_back(Color(msg->r, msg->g, msg->b));
+        if (m_vColor.size() > 5)
+        {
+            LOG("INFO : Robot : Searching Color.\n");
+            Color tempColor = NOCOLOR;
+            for (size_t i = 0; i < m_vColor.size(); i ++)
+            {
+                if (m_vColor[i] != NOCOLOR)
+                    tempColor = m_vColor[i];
+            }
+
+            m_pTTT->cbColor(m_nDesiX, m_nDesiY, tempColor);
+            m_vColor.clear();
+            m_State &= ~RS_WAITINGCOLOR;
+        }
     }
 }
 
@@ -311,5 +417,6 @@ void Robot::contactCb(const nxt_msgs::Contact::ConstPtr &msg)
     // todo
     if (msg->contact)
     {
+        LOG("INFO : Robot : Board just made 360.\n");
     }
 }

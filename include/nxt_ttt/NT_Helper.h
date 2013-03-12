@@ -16,6 +16,7 @@ public:
     ~Color();
 
     bool    operator==(const Color & color) { return compare(color); }
+    bool    operator!=(const Color & color) { return !compare(color); }
     const Color& operator=(const Color & color) { initFrom(color); return *this;}
 
     bool    compare(const Color & color);

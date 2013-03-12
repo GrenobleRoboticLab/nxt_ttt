@@ -15,6 +15,7 @@ Application::~Application()
 
 void Application::start() {
     LOG("INFO : Application : Calling ros::spin\n");
+    m_pTTT->play();
     ros::spin();
 }
 
