@@ -3,20 +3,36 @@
 using namespace nxt_ttt;
 
 Application::Application() {
-    m_pTTT = NULL;
+    LOG("INFO : Application : Constructing\n");
+    m_pTTT      = NULL;
+    m_pRobot    = NULL;
 }
 
-Application::~Application() {}
+Application::~Application()
+{
+    LOG("INFO : Application : Destructing\n");
+}
 
 void Application::start() {
+    LOG("INFO : Application : Calling ros::spin\n");
     ros::spin();
 }
 
 void Application::stop() {
+    LOG("INFO : Application : Calling ros::shutdown\n");
     ros::shutdown();
 }
 void Application::setTTT(AbstractTTT *pTTT) {
+    LOG("INFO : Application : Setting ttt pointer\n");
     m_pTTT = pTTT;
+    m_pTTT->setApplication(this);
+}
+
+void Application::setRobot(AbstractRobot *pRobot)
+{
+    LOG("INFO : Application : Setting robot pointer\n");
+    m_pRobot = pRobot;
+    m_pRobot->setApplication(this);
 }
 
 void Application::cbPlayed(NT_USER user)

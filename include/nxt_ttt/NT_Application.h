@@ -19,6 +19,7 @@ public:
     ~Application();
 
     void            setTTT(AbstractTTT* pTTT);
+    void            setRobot(AbstractRobot* pRobot);
 
     void            start();
     void            stop();

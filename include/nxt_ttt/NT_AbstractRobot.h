@@ -20,7 +20,7 @@ public:
     virtual void    dropBall(int x, int y) = 0;
     virtual void    waitPlayerPlay() = 0;
 
-private:
+protected:
     Application*    m_pApplication;
     AbstractTTT*    m_pTTT;
 

@@ -5,14 +5,36 @@
 #include "nxt_ttt/NT_TTT.h"
 #include "nxt_ttt/NT_Helper.h"
 
-
 #include <ros/ros.h>
 #include <nxt_msgs/JointCommand.h>
+#include <nxt_msgs/Color.h>
+#include <nxt_msgs/Range.h>
+#include <nxt_msgs/Contact.h>
+#include <sensor_msgs/JointState.h>
+
+#define BASE_EFF_INC 0.02f
 
 namespace nxt_ttt
 {
 
 class Robot;
+
+class BotBoard {
+public:
+    BotBoard();
+    ~BotBoard();
+
+    void                    updatePlatPos(double dPlatMotorPos);
+
+    double                  getPlatRotation(int x, int y);
+    double                  getSlideRotation(int x, int y);
+
+private:
+    double                  m_dPlatAngle;
+
+    double                  m_dFirstPlatMotorPos;
+    double                  m_dLastPlatMotorPos;
+};
 
 class MotorState {
 public:
@@ -56,6 +78,7 @@ public:
 
     bool                    update(const MotorState & state);
     bool                    rotate(double dRadAngle);
+    void                    stop();
 
     void                    setName(const std::string & sName) { m_sName = sName;   }
     std::string             getName()                    const { return m_sName;    }
@@ -72,6 +95,8 @@ private:
     float                   m_fEffDesi;
     float                   m_fEff;
 
+    float                   m_fVelocity;
+
     Robot*                  m_pParent;
     bool                    m_bHasGoal;
 
@@ -83,17 +108,19 @@ class Robot : public AbstractRobot
 {
 private:
     enum RobotAction {
+        RA_NONE,
         RA_GETCOLOR,
         RA_DROPBALL,
         RA_GETPLAYEREVENT
     };
 
     enum RobotState{
+        RS_NONE                 = 0,
         RS_TURNINGPLATMOTOR     = 1,
         RS_TURNINGDROPMOTOR     = 2,
-        RS_TURNINGCANONMOTOR    = 4,
+        RS_TURNINGSLIDEMOTOR    = 4,
         RS_WAITINGCOLOR         = 8,
-        RS_WAITINGPLAYEREVENT   = 16,
+        RS_WAITINGPLAYEREVENT   = 16
     };
 
 public:
@@ -108,9 +135,30 @@ public:
 
 private:
     ros::NodeHandle         m_NodeHandle;
+
+    ros::Subscriber         m_MotorSubscriber;
+    ros::Subscriber         m_UltraSubscriber;
+    ros::Subscriber         m_ColorSubscriber;
+    ros::Subscriber         m_ContactSubscriber;
+
+    RobotAction             m_CurrentAction;
+    unsigned long           m_State;
+
     Motor                   m_PlatMotor;
     Motor                   m_DropMotor;
     Motor                   m_SlideMotor;
+
+    int                     m_nDesiX;
+    int                     m_nDesiY;
+
+    double                  m_dPlatOr;
+
+    void                    stopAll();
+
+    void                    motorCb(const sensor_msgs::JointState::ConstPtr & msg);
+    void                    ultraCb(const nxt_msgs::Range::ConstPtr & msg);
+    void                    colorCb(const nxt_msgs::Color::ConstPtr & msg);
+    void                    contactCb(const nxt_msgs::Contact::ConstPtr & msg);
 
 }; // class Robot
 

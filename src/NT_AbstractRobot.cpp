@@ -3,11 +3,13 @@
 using namespace nxt_ttt;
 
 AbstractRobot::AbstractRobot() {
+    LOG("INFO : AbstractRobot : Constructing\n");
     m_pApplication  = NULL;
     m_pTTT          = NULL;
 }
 
 AbstractRobot::~AbstractRobot() {
+    LOG("INFO : AbstractRobot : Destructing\n");
 }
 
 void AbstractRobot::setApplication(Application *pApp) {

@@ -4,11 +4,15 @@ using namespace nxt_ttt;
 
 TTT::TTT() : AbstractTTT()
 {
+    LOG("INFO : TTT : Constructing\n");
     m_bBoardEmpty = true;
     m_bFirstTime = true;
 }
 
-TTT::~TTT() { ; }
+TTT::~TTT()
+{
+    LOG("INFO : TTT : Destructing\n");
+}
 
 void TTT::play()
 {

@@ -4,11 +4,15 @@
 using namespace nxt_ttt;
 
 FILE* pFile;
+time_t  startTime = time(NULL);
 
 void LOG(const std::string & sLog)
 {
     if (pFile)
+    {
+        fprintf(pFile, "%f : ", difftime(time(NULL), startTime));
         fputs(sLog.c_str(), pFile);
+    }
 }
 
 void STARTLOG(const char * pFilename)
