@@ -42,7 +42,6 @@ private:
 
 const int           TRANSLATE_X     = 1;
 const int           TRANSLATE_Y     = 1;
-const double        DROP_ROTATION   = 0.0;
 
 const Color         BOTCOLOR(0.0f, 0.0f, 1.0f);
 const Color         PLAYERCOLOR(0.0f, 1.0f, 0.0f);

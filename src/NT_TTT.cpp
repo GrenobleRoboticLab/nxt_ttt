@@ -17,51 +17,12 @@ TTT::~TTT()
 void TTT::play()
 {
     scan();
-/*
-    for (int i=0; i<3; i++)
-    {
-        for(int j=0; j<3; j++)
-        {
-            m_pRobot->getColor(i, j);
-            if(board[i][j]!=0)
-            {
-                boardEmpty == false;
-            }
-        }
-    }
-
-    if(boardEmpty)
-    {
-        AbstractRobot::dropBall(1,1);
-    }
-    else
-    {
-        if(firstTime)
-        {
-            if(board[1][1].isNotColor())
-            {
-                AbstractRobot::dropBall(1,1);
-                firstTime == false;
-            }
-            else
-            {
-                AbstractRobot::dropBall(0,2);
-                firstTime == false;
-            }
-        }
-        else
-        {
-            if(!forceDrop())
-            {
-                bestDrop();
-            }
-        }
-    }
-    */
 }
 
 void TTT::cbColor(int x, int y, Color color)
 {
+    LOG("INFO : TTT : Receive Color.\n");
+    std::cout << "\t\t\t\t\t : " << color.getRed() << " : " << color.getGreen() << " : " << color.getBlue() << std::endl;
     if (m_wCurrentState == TS_SCAN)
     {
         if (color.isColor())

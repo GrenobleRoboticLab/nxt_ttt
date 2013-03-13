@@ -27,8 +27,12 @@ double BotBoard::getPlatRotation(int x, int y)
 {
     int     nX      = x - TRANSLATE_X,
             nY      = y - TRANSLATE_Y;
+    double  dFac    = (nX + sqrt(pow(nX, 2) + pow(nY, 2)));
 
-    double  dAngle  = 2 * atan(nY / (nX + sqrt(pow(nX, 2) + pow(nY, 2))));
+    double  dAngle  = 0.0;
+
+    if (dFac != 0)
+        dAngle = 2 * atan(nY / dFac);
 
     return dAngle - m_dPlatAngle;
 }
@@ -38,7 +42,7 @@ double BotBoard::getColorSlideRotation(int x, int y)
     int     nX      = x - TRANSLATE_X,
             nY      = y - TRANSLATE_Y;
 
-    return /* double dRad = */sqrt(pow(nX, 2) + pow(nY, 2)) - m_dSlideAngle;
+    return 0.2 * (sqrt(pow(nX, 2) + pow(nY, 2)) - m_dSlideAngle);
 }
 
 double BotBoard::getDropSlideRotation(int x, int y)
@@ -46,5 +50,5 @@ double BotBoard::getDropSlideRotation(int x, int y)
     int     nX      = x - TRANSLATE_X,
             nY      = y - TRANSLATE_Y;
 
-    return /* double dRad = */sqrt(pow(nX, 2) + pow(nY, 2)) - m_dSlideAngle;
+    return (0.2 * (sqrt(pow(nX, 2) + pow(nY, 2)) - m_dSlideAngle)) + 1.57;
 }

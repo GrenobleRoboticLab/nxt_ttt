@@ -10,6 +10,14 @@ Robot::Robot() :
 {
     LOG("INFO : Robot : Constructing\n");
     m_CurrentAction     = RA_NONE;
+    m_State             = RS_NONE;
+
+    m_pApplication      = NULL;
+    m_pTTT              = NULL;
+    m_nDesiX            = 0;
+    m_nDesiY            = 0;
+    m_dPlatOr           = 0.0;
+    m_vColor.clear();
 
     m_MotorSubscriber   = m_NodeHandle.subscribe("joint_state", 1, &Robot::motorCb, this);
     m_UltraSubscriber   = m_NodeHandle.subscribe(ULTRANAME, 1, &Robot::ultraCb, this);
@@ -25,6 +33,7 @@ Robot::~Robot()
 
 void Robot::getColor(int x, int y)
 {
+    std::cout << "\t\t\033[1;31m" << "Ask for getting color x = " << x << " y = " << y << "\033[0m\n\n";
     if(m_CurrentAction == RA_NONE)
     {
         LOG("INFO : Robot : Started action : getting color\n");
@@ -37,7 +46,7 @@ void Robot::getColor(int x, int y)
         rotateSlideMotor(m_BotBoard.getColorSlideRotation(x, y));
     }
     else //if (m_CurrentAction != RA_NONE)
-        LOG("ERROR : Robot : The robot didn't finish his previous action.\n");
+        LOG("ERROR : Robot : GETCOLOR : The robot didn't finish his previous action.\n");
 }
 
 void Robot::dropBall(int x, int y)
@@ -55,13 +64,13 @@ void Robot::dropBall(int x, int y)
         rotateSlideMotor(m_BotBoard.getDropSlideRotation(x, y));
     }
     else // if (m_CurrentAction != RA_NONE)
-        LOG("ERROR : Robot : The robot didn't finidh his previous action.\n");
+        LOG("ERROR : Robot : DROPBALL : The robot didn't finish his previous action.\n");
 }
 
 void Robot::waitPlayerPlay()
 {
     if (m_CurrentAction != RA_NONE)
-        LOG("ERROR : Robot : The robot didn't finish his previous action.\n");
+        LOG("ERROR : Robot : WAITPLAYER : The robot didn't finish his previous action.\n");
     stopAll();
     m_CurrentAction = RA_GETPLAYEREVENT;
 }
@@ -102,15 +111,13 @@ void Robot::actionPerformed(const std::string &sMotorName)
             if (bDropped)
             {
                 LOG("INFO : Robot : TTT Played\n");
-                m_DropMotor.rollback();
-
-                if (m_pApplication)
-                    m_pApplication->cbPlayed(NT_PLAYER);
 
                 m_CurrentAction = RA_NONE;
+                if (m_pTTT)
+                    m_pTTT->cbDropped(m_nDesiX, m_nDesiY);
             }
             else // if(!bDropped)
-                rotateDropMotor(DROP_ROTATION);
+                rotateDropMotor(2 * M_PI);
         }
     }
 }
@@ -125,18 +132,21 @@ void Robot::stopAll()
 
 void Robot::rotateDropMotor(double dRad)
 {
+    std::cout << "\t\t\033[1;31m" << "Ask for rotate DropMotor " << dRad << "\033[0m\n\n";
     m_State |= RS_TURNINGDROPMOTOR;
     m_DropMotor.rotate(dRad);
 }
 
 void Robot::rotatePlatMotor(double dRad)
 {
+    std::cout << "\t\t\033[1;31m" << "Ask for rotate PlatMotor " << dRad << "\033[0m\n\n";
     m_State |= RS_TURNINGPLATMOTOR;
     m_PlatMotor.rotate(dRad);
 }
 
 void Robot::rotateSlideMotor(double dRad)
 {
+    std::cout << "\t\t\033[1;31m" << "Ask for rotate SlideMotor" << dRad << "\033[0m\n\n";
     m_State |= RS_TURNINGSLIDEMOTOR;
     m_SlideMotor.rotate(dRad);
 }
@@ -163,7 +173,7 @@ void Robot::ultraCb(const nxt_msgs::Range::ConstPtr &msg)
 {
     if (m_CurrentAction == RA_GETPLAYEREVENT)
     {
-        if (msg->range < 0.2)
+        if (msg->range < 0.1)
         {
             LOG("INFO : Robot : Player Played\n");
             if (m_pApplication)
@@ -188,10 +198,10 @@ void Robot::colorCb(const nxt_msgs::Color::ConstPtr &msg)
                     tempColor = m_vColor[i];
             }
 
+            m_CurrentAction = RA_NONE;
             m_pTTT->cbColor(m_nDesiX, m_nDesiY, tempColor);
             m_vColor.clear();
             m_State &= ~RS_WAITINGCOLOR;
-            m_CurrentAction = RA_NONE;
         }
     }
 }
@@ -201,6 +211,6 @@ void Robot::contactCb(const nxt_msgs::Contact::ConstPtr &msg)
     // todo
     if (msg->contact)
     {
-        LOG("INFO : Robot : Board just made 360.\n");
+       // LOG("INFO : Robot : Board just made 360.\n");
     }
 }

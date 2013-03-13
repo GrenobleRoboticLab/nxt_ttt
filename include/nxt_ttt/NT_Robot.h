@@ -15,7 +15,7 @@
 #include <nxt_msgs/Contact.h>
 #include <sensor_msgs/JointState.h>
 
-#define BASE_EFF_INC 0.02f
+#define BASE_EFF_INC 0.11f
 
 namespace nxt_ttt
 {

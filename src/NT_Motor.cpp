@@ -114,10 +114,10 @@ void Motor::checkGoal()
 
     if (m_bHasGoal)
     {
-        if (m_fVelocity == 0.0 && (m_fEff == m_fEffDesi))
+        if (abs(m_fVelocity) < 1 && (m_fEff > (m_fEffDesi - .05f)) && (m_fEff < (m_fEffDesi + .05f)))
         {
             if (m_fEffDesi == 0.0)
-                m_fEffDesi = 0.47f;
+                m_fEffDesi = 0.30f;
 
             LOG("INFO : Motor : " + m_sName + " Increase effort.\n");
             if (m_fPosDesi > m_fPos)
@@ -129,9 +129,9 @@ void Motor::checkGoal()
         }
         else // if (abs(m_fVelocity) > 0)
         {
-            if ((m_fEffDesi >= 0)
-             && (m_fPos < (m_fPosDesi + .2f))
-             && (m_fPos > (m_fPosDesi - .2)))
+            if ((abs(m_fEffDesi) >= 0)
+            && (m_fPos < (m_fPosDesi + .1f))
+            && (m_fPos > (m_fPosDesi - .1f)))
             {
                 LOG("INFO : Motor : "+ m_sName + " Goal reach\n");
                 m_fEffDesi  = 0.0f;
