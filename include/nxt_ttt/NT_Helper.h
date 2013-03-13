@@ -40,9 +40,19 @@ private:
 
 };
 
-const Color BOTCOLOR(0.0f, 0.0f, 1.0f);
-const Color PLAYERCOLOR(0.0f, 1.0f, 0.0f);
-const Color NOCOLOR(0.0f, 0.0f, 0.0f);
+const int           TRANSLATE_X     = 1;
+const int           TRANSLATE_Y     = 1;
+const double        DROP_ROTATION   = 0.0;
+
+const Color         BOTCOLOR(0.0f, 0.0f, 1.0f);
+const Color         PLAYERCOLOR(0.0f, 1.0f, 0.0f);
+const Color         NOCOLOR(0.0f, 0.0f, 0.0f);
+const std::string   PLATNAME("plat_motor");
+const std::string   SLIDENAME("slide_motor");
+const std::string   DROPNAME("drop_motor");
+const std::string   ULTRANAME("ultra_sensor");
+const std::string   COLORNAME("color_sensor");
+const std::string   CONTACTNAME("contact_sensor");
 
 }
 
