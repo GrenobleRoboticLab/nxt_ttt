@@ -209,8 +209,28 @@ void TTT::continueScan()
     }
 }
 
+void TTT::printBoard()
+{
+    std::cout << std::endl << "BOARD SCANNED" << std::endl;
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            if (m_Board[i][j] == NOCOLOR)
+                std::cout << "?";
+            else if (m_Board[i][j] == PLAYERCOLOR)
+                std::cout << "X";
+            else if (m_Board[i][j] == BOTCOLOR)
+                std::cout << "O";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl << std::endl  << std::endl;
+}
+
 void TTT::treat()
 {
+    printBoard();
     m_wCurrentState = TS_DROP;
 
     if(m_bBoardEmpty)

@@ -58,6 +58,8 @@ private:
     bool            applyResult(CheckResult check);
     void            bestDrop();
 
+    void            printBoard();
+
 }; // class TTT
 
 }
