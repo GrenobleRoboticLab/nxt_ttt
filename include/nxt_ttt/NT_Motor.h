@@ -1,6 +1,7 @@
 #ifndef NT_MOTOR_H
 #define NT_MOTOR_H
 
+#include "NT_AbstractRobot.h"
 #include <nxt_msgs/JointCommand.h>
 #include <ros/ros.h>
 
@@ -45,7 +46,7 @@ private:
     Motor(const Motor&);
     const Motor& operator=(const Motor&);
 public:
-    Motor(ros::NodeHandle & nh, const std::string & sName, Robot * pParent = NULL);
+    Motor(ros::NodeHandle & nh, const std::string & sName, AbstractRobot * pParent = NULL);
     virtual ~Motor();
 
     bool                    update(const MotorState & state);
@@ -61,7 +62,7 @@ private:
     ros::Publisher          m_Publisher;
     nxt_msgs::JointCommand  m_Command;
 
-    Robot*                  m_pParent;
+    AbstractRobot*          m_pParent;
     bool                    m_bHasGoal;
     double                  m_dLastRotation;
 

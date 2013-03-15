@@ -40,7 +40,7 @@ bool MotorState::compare(const MotorState &state)
     return false;
 }
 
-Motor::Motor(ros::NodeHandle &nh, const std::string & sName, Robot *pParent)
+Motor::Motor(ros::NodeHandle &nh, const std::string & sName, AbstractRobot *pParent)
 {
     LOG("INFO : Motor : " + sName + " Constructing\n");
     m_Publisher = nh.advertise<nxt_msgs::JointCommand>("joint_command", 1);
@@ -92,6 +92,8 @@ bool Motor::rotate(double dRadAngle)
     }
     else
         LOG("ERROR : Motor : " + m_sName + " Try to set goal but has already a goal.\n");
+
+    std::cout << "pos desi : " << m_fPosDesi << std::endl;
 
     return bRet;
 }

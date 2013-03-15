@@ -48,7 +48,7 @@ public:
     virtual void            dropBall(int x, int y);
     virtual void            waitPlayerPlay();
 
-    void                    actionPerformed(const std::string & sMotorName);
+    virtual void            actionPerformed(const std::string & sMotorName);
 
 private:
     ros::NodeHandle         m_NodeHandle;

@@ -19,6 +19,7 @@ public:
     virtual void    getColor(int x, int y) = 0;
     virtual void    dropBall(int x, int y) = 0;
     virtual void    waitPlayerPlay() = 0;
+    virtual void    actionPerformed(const std::string & sMotorName) = 0;
 
 protected:
     Application*    m_pApplication;
