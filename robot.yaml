@@ -2,7 +2,7 @@ nxt_robot:
   - type: motor
     name: drop_motor
     port: PORT_A
-    desired_frequency: 10.0
+    desired_frequency: 30.0
 
   - type: motor
     name: slide_motor

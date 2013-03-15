@@ -28,9 +28,9 @@ private:
     ros::NodeHandle m_nh;
     ros::Subscriber m_MSub;
 
-    Motor           m_SlideMotor;
-    Motor           m_DropMotor;
-    Motor           m_PlatMotor;
+    Motor          *m_SlideMotor;
+    Motor          *m_DropMotor;
+    Motor          *m_PlatMotor;
 
     bool            m_bNeedDisplay;
 
