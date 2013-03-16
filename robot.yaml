@@ -2,17 +2,17 @@ nxt_robot:
   - type: motor
     name: drop_motor
     port: PORT_A
-    desired_frequency: 30.0
+    desired_frequency: 45.0
 
   - type: motor
     name: slide_motor
     port: PORT_B
-    desired_frequency: 30.0
+    desired_frequency: 45.0
 
   - type: motor
     name: plat_motor
     port: PORT_C
-    desired_frequency: 30.0
+    desired_frequency: 45.0
 
   - type: touch
     frame_id: touch_frame

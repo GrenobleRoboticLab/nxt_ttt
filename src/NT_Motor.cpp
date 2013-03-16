@@ -72,6 +72,9 @@ bool Motor::update(const MotorState &state)
         m_fVelocity = state.getVelocity();
         bRet        = true;
 
+        std::cout << "bite:"<< m_sName << m_fPos << std::endl;
+
+
         checkGoal();
     }
 
@@ -142,6 +145,13 @@ void Motor::checkGoal()
                 m_pParent->actionPerformed(m_sName);
             }
         }
+
+        std::cout << "Name : " << m_sName << std::endl;
+
+        std::cout << "pos desi : " << m_fPosDesi << std::endl;
+        std::cout << "pos actuelle :" << m_fPos << std::endl;
+        std::cout << "effort : " << m_fEff << std::endl;
+        std::cout << "velocity : " << m_fVelocity << std::endl;
     }
     else
     {

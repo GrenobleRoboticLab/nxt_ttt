@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#include "nxt_ttt/NT_AbstractRobot.h"
-#include "nxt_ttt/NT_TTT.h"
-#include "nxt_ttt/NT_Helper.h"
-#include "nxt_ttt/NT_BotBoard.h"
-#include "nxt_ttt/NT_Motor.h"
+#include "NT_AbstractRobot.h"
+#include "NT_TTT.h"
+#include "NT_Helper.h"
+#include "NT_BotBoard.h"
+#include "NT_RobotAction.h"
 
 #include <ros/ros.h>
 #include <nxt_msgs/Color.h>
@@ -52,38 +52,30 @@ public:
 
 private:
     ros::NodeHandle         m_NodeHandle;
-
-    ros::Subscriber         m_MotorSubscriber;
+    ros::Publisher          m_MotorPub;
     ros::Subscriber         m_UltraSubscriber;
     ros::Subscriber         m_ColorSubscriber;
     ros::Subscriber         m_ContactSubscriber;
 
-    RobotAction             m_CurrentAction;
-    unsigned long           m_State;
+    MotorAction*            m_pMotorAction;
 
-    Motor                   m_PlatMotor;
-    Motor                   m_DropMotor;
-    Motor                   m_SlideMotor;
+    RobotAction             m_CurrentAction;
+    RobotState              m_State;
 
     BotBoard                m_BotBoard;
 
     int                     m_nDesiX;
     int                     m_nDesiY;
 
-    double                  m_dPlatOr;
+    bool                    m_bNeedRelease;
 
     std::vector<Color>      m_vColor;
 
-    void                    stopAll();
-    void                    rotatePlatMotor(double dRad);
-    void                    rotateSlideMotor(double dRad);
-    void                    rotateDropMotor(double dRad);
-
-    void                    motorCb(const sensor_msgs::JointState::ConstPtr & msg);
     void                    ultraCb(const nxt_msgs::Range::ConstPtr & msg);
     void                    colorCb(const nxt_msgs::Color::ConstPtr & msg);
     void                    contactCb(const nxt_msgs::Contact::ConstPtr & msg);
 
+    void                    releaseMotorAction();
 }; // class Robot
 
 } // namespace nxt_ttt

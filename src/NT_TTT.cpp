@@ -233,11 +233,11 @@ void TTT::treat()
     printBoard();
     m_wCurrentState = TS_DROP;
 
-    if(m_bBoardEmpty)
-    {
+    // if(m_bBoardEmpty)
+    // {
         m_pRobot->dropBall(1,1);
         return;
-    }
+    /*}
     else
     {
         CheckResult result;
@@ -261,7 +261,7 @@ void TTT::treat()
         if (applyResult(result))
             return;
     }
-    bestDrop();
+    bestDrop();*/
 }
 
 bool TTT::applyResult(CheckResult check)

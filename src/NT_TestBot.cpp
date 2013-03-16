@@ -14,36 +14,41 @@ TestBot::TestBot() :
 
 void TestBot::motorCb(const sensor_msgs::JointState::ConstPtr & msg)
 {
-std::cout << m_sCurrentMotor << std::endl;
-
     if (msg->name.size() > 1)
         std::cout << "Plus d'un JointState dans le message." << std::endl;
 
     if (msg->name.back() == m_sCurrentMotor)
     {
-        std::cout << "Message inc" << std::endl;
         if (m_bNeedDisplay)
         {
             if (msg->velocity.back() == 0.0)
             {
-                std::cout << "Dernière position du mouvement : " << msg->position.back() << std::endl;
+                if (m_PlatMotor->getName() == m_sCurrentMotor) {
+                    std::cout << "Dernière position après mouvement : " << msg->position.back() << std::endl;
+                    m_PlatMotor->update(MotorState(msg->name.back(), msg->effort.back(), msg->position.back(), msg->velocity.back()));
+                }
+
+
+
+
                 m_bNeedDisplay = false;
                 ask();
             }
         }
         else if (m_DropMotor->getName() == m_sCurrentMotor) {
-            std::cout << "Message inc DROP" << std::endl;
             m_DropMotor->update(MotorState(msg->name.back(), msg->effort.back(), msg->position.back(), msg->velocity.back()));
         }
         else if (m_SlideMotor->getName() == m_sCurrentMotor) {
-            std::cout << "Message inc SLIDE" << std::endl;
             m_SlideMotor->update(MotorState(msg->name.back(), msg->effort.back(), msg->position.back(), msg->velocity.back()));
         }
         else if (m_PlatMotor->getName() == m_sCurrentMotor) {
-            std::cout << "Message inc PLAT" << std::endl;
+            std::cout << "nom du moteur : " << msg->name.back() << std::endl;
+            std::cout << "Dernière position du mouvement : " << msg->position.back() << std::endl;
+            std::cout << "Dernière position du mouvement + 3 : " << msg->position.back()+3.0 << std::endl;
+            std::cout << "Dernière effort du mouvement : " << msg->effort.back() << std::endl;
+            std::cout << "Dernière velocité du mouvement : " << msg->velocity.back() << std::endl;
             m_PlatMotor->update(MotorState(msg->name.back(), msg->effort.back(), msg->position.back(), msg->velocity.back()));
         }
-        std::cout << "Message inc" << std::endl;
     }
 }
 
@@ -81,7 +86,7 @@ void TestBot::ask()
 
     if (pMotorChoose)
     {
-        std::cout << "En attente..." << std::cout;
+        std::cout << "En attente..." << std::endl;
         pMotorChoose->rotate(dPosDesi);
     }
     else ask();

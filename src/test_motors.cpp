@@ -1,4 +1,4 @@
-#include "NT_TestBot.h"
+#include "TestBot2.h"
 
 using namespace nxt_ttt;
 
@@ -9,7 +9,7 @@ int main(int argc, char ** argv)
     {
         ros::init(argc, argv, "test_motors");
 
-        TestBot tb;
+        TestBot2 tb;
         tb.ask();
 
         ros::spin();
