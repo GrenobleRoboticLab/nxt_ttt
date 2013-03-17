@@ -43,7 +43,7 @@ private:
 const int           TRANSLATE_X     = 1;
 const int           TRANSLATE_Y     = 1;
 
-const Color         BOTCOLOR(0.0f, 0.0f, 1.0f);
+const Color         BOTCOLOR(1.0f, 1.0f, 0.0f);
 const Color         PLAYERCOLOR(0.0f, 1.0f, 0.0f);
 const Color         NOCOLOR(0.0f, 0.0f, 0.0f);
 const std::string   PLATNAME("plat_motor");

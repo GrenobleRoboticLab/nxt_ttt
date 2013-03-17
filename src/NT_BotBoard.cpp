@@ -37,12 +37,12 @@ double BotBoard::getColorSlideRotation(int x, int y)
 {
     if (x == 1 && y == 1)
         return 1.2;
-    else return 0.5;
+    else return 0.4;
 }
 
 double BotBoard::getDropSlideRotation(int x, int y)
 {
     if (x == 1 && y == 1)
-        return 2;
-    else return 1.5;
+        return 2.5;
+    else return 2;
 }

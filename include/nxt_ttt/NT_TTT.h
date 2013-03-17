@@ -9,13 +9,9 @@ namespace nxt_ttt
 
 struct Point {
     Point(){ ; }
-    Point(const Point & p){
-        x = p.x;
-        y = p.y;
-    }
     Point(int _x, int _y) {
         x = _x;
-        x = _y;
+        y = _y;
     }
 
     int x;
@@ -24,9 +20,9 @@ struct Point {
 
 // coordonnées des cases pour chaque ligne
 const    Point LINES[8][3] = {
-    {Point(0,2),Point(1,2),Point(2,2)}, //UPROW
+    {Point(0,0),Point(1,0),Point(2,0)}, //UPROW
     {Point(0,1),Point(1,1),Point(2,1)}, //MIDDLEROW
-    {Point(0,0),Point(1,0),Point(2,0)}, //DOWNROW
+    {Point(0,2),Point(1,2),Point(2,2)}, //DOWNROW
     {Point(0,2),Point(0,1),Point(0,0)}, //LEFTCOL
     {Point(1,2),Point(1,1),Point(1,0)}, //MIDDLECOL
     {Point(2,2),Point(2,1),Point(2,0)}, //RIGHTCOL
@@ -45,11 +41,11 @@ private:
 
 
     enum StateFlag {
-        SF_BOTONE,
-        SF_EMPTY,
-        SF_PLAYERONE,
-        SF_ONEEACH,
-        SF_NONE
+        SF_BOTONE = 0,
+        SF_EMPTY = 1,
+        SF_PLAYERONE = 2,
+        SF_ONEEACH = 3,
+        SF_NONE = 4
     };
 
 public:
