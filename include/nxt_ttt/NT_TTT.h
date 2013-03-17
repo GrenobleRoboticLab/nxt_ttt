@@ -6,6 +6,34 @@
 namespace nxt_ttt
 {
 
+
+struct Point {
+    Point(){ ; }
+    Point(const Point & p){
+        x = p.x;
+        y = p.y;
+    }
+    Point(int _x, int _y) {
+        x = _x;
+        x = _y;
+    }
+
+    int x;
+    int y;
+};
+
+// coordonnées des cases pour chaque ligne
+const    Point LINES[8][3] = {
+    {Point(0,2),Point(1,2),Point(2,2)}, //UPROW
+    {Point(0,1),Point(1,1),Point(2,1)}, //MIDDLEROW
+    {Point(0,0),Point(1,0),Point(2,0)}, //DOWNROW
+    {Point(0,2),Point(0,1),Point(0,0)}, //LEFTCOL
+    {Point(1,2),Point(1,1),Point(1,0)}, //MIDDLECOL
+    {Point(2,2),Point(2,1),Point(2,0)}, //RIGHTCOL
+    {Point(0,2),Point(1,1),Point(2,0)}, //UPDOWNDIAG
+    {Point(0,0),Point(1,1),Point(2,2)}, //DOWNUPDIAG
+};
+
 class TTT : public AbstractTTT
 {
 private:
@@ -15,18 +43,13 @@ private:
         TS_NONE
     };
 
-    enum CaseFlag {
-        CF_WARNING,
-        CF_CHOICE,
-        CF_FREE,
-        CF_WIN,
-        CF_LOSE
-    };
 
-    struct CheckResult {
-        int lastX;
-        int lastY;
-        CaseFlag flag;
+    enum StateFlag {
+        SF_BOTONE,
+        SF_EMPTY,
+        SF_PLAYERONE,
+        SF_ONEEACH,
+        SF_NONE
     };
 
 public:
@@ -40,10 +63,6 @@ public:
 
 private:
 
-    CheckResult     checkRow(int j);
-    CheckResult     checkCol(int i);
-    CheckResult     checkDiag(int i);
-
     Color           m_Board[3][3];
     bool            m_bBoardEmpty;
     bool            m_bFirstTime;
@@ -54,13 +73,18 @@ private:
 
     void            scan();
     void            continueScan();
+
+    void            exploreLines();
+    int             weightCase(Point point);
+    Point           bestCase();
+
     void            treat();
-    bool            applyResult(CheckResult check);
-    void            bestDrop();
 
     void            printBoard();
 
+
 }; // class TTT
+
 
 }
 
